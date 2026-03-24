@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyShop Notifications</title>
+</head>
+<body>
+
+<h2>Enable Notification</h2>
+<button onclick="initNotification()">Enable</button>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-messaging.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCQJLUFqF-tf8hr2lr5e6vMNwzVsvofMos",
+  authDomain: "apna-store-4e151.firebaseapp.com",
+  projectId: "apna-store-4e151",
+  messagingSenderId: "326132934284",
+  appId: "1:326132934284:web:2c455b1aafcaf3349d3da9"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const messaging = getMessaging(app);
+
+window.initNotification = async function(){
+  const permission = await Notification.requestPermission();
+
+  if(permission === "granted"){
+    const token = await getToken(messaging,{
+      vapidKey: "BEn5PpM4jjsrT4gbbN6a-IEurAT1w9Sg0UCDPIwSv59b_f-vcjK0_17Z7RY3KddTTmTRJDHAY0Fs42SlMjc6Lbc"
+    });
+
+    console.log(token);
+
+    await setDoc(doc(db,"tokens",token),{ token: token });
+
+    alert("Enabled");
+  }
+};
+
+onMessage(messaging,(payload)=>{
+  new Notification(payload.notification.title,{
+    body: payload.notification.body
+  });
+});
+</script>
+
+</body>
+</html>
